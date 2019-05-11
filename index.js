@@ -1,69 +1,77 @@
 const axios = require('axios');
 const fs = require('fs');
 
-const env = require('./env.json')
+const env = require('./env.json');
 // endpoints from https://www.dropbox.com/developers/documentation/http/documentation
-const api = require('./api.json')
+const api = require('./api.json');
 
-const _opts = {
-  method: 'post',
-  headers: {
-    'Authorization': `Bearer ${env.app_token}`,
-    'Content-Type': 'application/json',
-  },
-  data: JSON.stringify({
-    path: ''
-  })
-};
+const Authorization = `Bearer ${env.app_token}`;
 
-function getFileMetaByName (name) {
-  const opts = {..._opts, 
-    data: JSON.stringify({path: `/${name}`})
-  };
-  return axios(api.file_meta, opts);
-}
-
-function getFolderContents () {
-  const opts = {..._opts};
-  return axios(api.folder_contents, opts);
-}
-
-function uploadLocalFile (localFile, fileName) {
-  const ext = localFile.split('.').pop();
-  const opts = {..._opts,
-    data: fs.createReadStream(localFile),
-    headers: {..._opts.headers,
-      'Dropbox-Api-Arg': JSON.stringify({
-        path: `/${fileName}.${ext}`,
-        mode: 'add'
-      }),
-      'Content-Type': 'application/octet-stream'
+function getFileMetaByName (filePath) {;
+  return axios(api.file_meta, {
+    method: 'POST',
+    headers: {
+      Authorization,
+      'Content-Type': 'application/json'
     },
-  };
-  return axios(api.upload, opts);
+    data: {path: `/${filePath}`}
+  });
 }
 
-function uploadRemoteFile () {
-  const x = 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/198/books_1f4da.png';
-  const opts = {..._opts,
-    // error here: cant send remote image as stream yet..
-    data: axios(x),
-    headers : {..._opts.headers,
-      'Dropbox-Api-Arg': JSON.stringify({
-        path: '/remosste.png',
-        mode: 'add'
-      }),
-      'Content-Type': 'application/octet-stream',
+function getFolderContents (folderPath) {
+  return axios(api.folder_contents, {
+    method: 'POST',
+    headers: {
+      Authorization,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      path: folderPath
     }
-  };
-  return axios(api.upload, opts);
+  });
 }
 
-// log(getFileMetaByName('test.txt'))
-// log(getFolderContents())
-const testPath = __dirname + '/test.txt'
-// log(uploadFile(testPath, 'yeeeeet'));
-log(uploadRemoteFile());
+function uploadLocalFile (localFile, filePath) {
+  return axios(api.upload, {
+    method: 'POST',
+    data: fs.createReadStream(localFile),
+    headers: {
+      Authorization,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-Api-Arg': JSON.stringify({
+        path: `/${filePath}`,
+        mode: 'add'
+      })
+    }
+  });
+}
+
+
+// Save the data from a specified URL into a file in user's Dropbox.
+// Note that the transfer from the URL must complete within 5 minutes, or the operation will time out and the job will fail.
+function uploadRemoteFile (url, filePath) {
+  return axios(api.upload_remote, {
+    method: 'POST',
+    headers : {
+      Authorization,
+      'Content-Type': 'application/json',
+    },
+    data: {
+      url,
+      path: `/${filePath}`
+    }
+  });
+}
+
+//TESTED
+// log(getFileMetaByName('remooote.png'));
+// log(getFolderContents(''));
+// log(uploadLocalFile('./test.txt', 'haha-nice.txt'));
+// log(uploadRemoteFile(
+//   'https://www.mixdownmag.com.au/sites/default/files/styles/flexslider_h400/public/images/Stu Main.jpg',
+//   'stewart.jpg'
+// ));
+//UNTESTED
 
 function log (p) {
   p.then(r => console.log(r.data))
