@@ -1,5 +1,5 @@
 {
-  "name": "jvb-db",
+  "name": "jvb-dbx-cli",
   "version": "0.0.0",
   "description": "drop it like its hot",
   "bin": {
