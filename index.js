@@ -18,7 +18,7 @@ module.exports = {
   downloadImage
 };
 
-function getFileMetaByName (filePath) {;
+function getFileMetaByName (filePath) {
   return axios(api.file_meta, {
     method: 'POST',
     headers: {
@@ -88,7 +88,7 @@ function downloadFile (pathOrId, saveName) {
   })
   .then(({headers, data}) => {
     // if no saveName: parse headers and save as dropbox fileName
-    const fileName = saveName || (getFileNameFromHeaders(headers));
+    const fileName = saveName || getFileNameFromHeaders(headers);
 
     const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
     fs.writeFileSync(downloadPath, data);
@@ -112,7 +112,7 @@ function downloadImage (pathOrId, saveName) {
     }
   })
   .then(({data, headers}) => {
-    const fileName = saveName || (getFileNameFromHeaders(headers));
+    const fileName = saveName || getFileNameFromHeaders(headers);
 
     const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
     const writer = fs.createWriteStream(downloadPath);
