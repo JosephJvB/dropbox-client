@@ -9,8 +9,14 @@ home-brewed programmatic dropbox client.
 - Upload a single file from url-resource
 - Download txtfile by dropbox-path or id
 - Download imagefile by dropbox-path or id
+- Add base CLI framework [meow](https://www.npmjs.com/package/meow)
+- Download image / file controlled by handleDownload
 
 ### TODO
-- Refactor to one download function that can handle all file-types?
+- create handleUpload to manage the two upload functions
+- make CLI nicer
+    - spinners: [ora](https://github.com/sindresorhus/ora)
+    - scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
+    - maybe download lets you view available files before choosing one?
+- Create something tidier than current log function.
 - Batch upload/download?
-- Some kind of CLI. Pretty interface, spinners, selectors, scrollers and all that jazz.

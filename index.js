@@ -41,26 +41,26 @@ if(!action) {
     return cli.showHelp(0); // exit on error code 0 (swallow)
 }
 
-const doAction = () => {
-    switch(action.toLowerCase()) {
-        case 'gm': log(lib.getMetaData(identifier));
-            break;
-        case 'gc': log(lib.getFolderContents(identifier));
-            break;
-        case 'ul': log(lib.uploadLocalFile(identifier, as));
-            break;
-        case 'gr': log(lib.uploadRemoteFile(identifier, as));
-            break;
-        case 'd':
-        case 'dl': log(lib.handleDownload(identifier, as));
-            break;
-        default: cli.showHelp(0);
-    }
+switch(action.toLowerCase()) {
+    case 'gm': log(lib.getMetaData(identifier));
+        break;
+    case 'gc': log(lib.getFolderContents(identifier));
+        break;
+    case 'up':
+    case 'up-l':
+    case 'ul': log(lib.uploadLocalFile(identifier, as));
+        break;
+    case 'up-r':
+    case 'up-url':
+    case 'ur': log(lib.uploadRemoteFile(identifier, as));
+        break;
+    case 'd':
+    case 'dl': log(lib.handleDownload(identifier, as));
+        break;
+    default: cli.showHelp(0);
 }
 
 function log (p) {
     p.then(r => console.log(JSON.stringify(r.data, null, 2)))
     .catch(console.error);
 }
-
-doAction();
