@@ -1,6 +1,6 @@
 {
   "name": "jvb-dbx-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "drop it like its hot",
   "bin": {
     "dbx": "index.js"
@@ -13,6 +13,7 @@
   "author": "Me",
   "license": "Mine thanks",
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "meow": "^5.0.0"
   }
 }
