@@ -2,5 +2,6 @@
   "folder_contents": "https://api.dropboxapi.com/2/files/list_folder",
   "file_meta": "https://api.dropboxapi.com/2/files/get_metadata",
   "upload": "https://content.dropboxapi.com/2-beta-2/files/upload",
-  "upload_remote": "https://api.dropboxapi.com/2/files/save_url"
+  "upload_remote": "https://api.dropboxapi.com/2/files/save_url",
+  "download": "https://content.dropboxapi.com/2/files/download"
 }
