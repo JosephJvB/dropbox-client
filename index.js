@@ -1,157 +1,66 @@
-const axios = require('axios');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const meow = require('meow');
 
-const env = require('./env.json');
-// endpoints from https://www.dropbox.com/developers/documentation/http/documentation
-const api = require('./api.json');
+const lib = require('./lib')
 
-const Authorization = `Bearer ${env.app_token}`;
+const cli = meow(`
+    Usage
+    dbx [action] [options]
 
-module.exports = {
-  getFileMetaByName,
-  getFolderContents,
-  uploadLocalFile,
-  uploadRemoteFile,
-  downloadFile,
-  downloadImage
-};
+    [Get]
+    dbx gc [path/id]  get folder contents
+    dbx gm [path/id]  get file/folder meta-data
 
-function getFileMetaByName (filePath) {
-  return axios(api.file_meta, {
-    method: 'POST',
-    headers: {
-      Authorization,
-      'Content-Type': 'application/json'
-    },
-    data: {path: `/${filePath}`}
-  });
-}
+    -- cannot get meta-data at root path --
 
-function getFolderContents (folderPath) {
-  return axios(api.folder_contents, {
-    method: 'POST',
-    headers: {
-      Authorization,
-      'Content-Type': 'application/json'
-    },
-    data: {
-      path: folderPath
+
+    [Upload]
+    dbx ul ./file.txt --as new-db-file.txt  upload local
+    dbx ur https://file.txt --as new-db-file.txt  upload remote
+
+
+    [Download]
+    dbx D [file-path/id]  --as new-local-file.txt  download
+
+    nb: --as flags are optional
+`, {
+    flags: {
+        help: {
+            type: 'boolean',
+            alias: 'h'
+        },
+        as: {
+            type: 'string',
+            default: null
+        }
     }
-  });
+});
+
+const [action, identifier] = cli.input;
+const as = cli.flags.as;
+if(!action) {
+    return cli.showHelp(0); // exit on error code 0 (swallow)
 }
 
-function uploadLocalFile (localFile, filePath) {
-  return axios(api.upload, {
-    method: 'POST',
-    data: fs.createReadStream(localFile),
-    headers: {
-      Authorization,
-      'Content-Type': 'application/octet-stream',
-      'Dropbox-Api-Arg': JSON.stringify({
-        path: `/${filePath}`,
-        mode: 'add'
-      })
+const doAction = () => {
+    switch(action.toLowerCase()) {
+        case 'gm': log(lib.getMetaData(identifier));
+            break;
+        case 'gc': log(lib.getFolderContents(identifier));
+            break;
+        case 'ul': log(lib.uploadLocalFile(identifier, as));
+            break;
+        case 'gr': log(lib.uploadRemoteFile(identifier, as));
+            break;
+        case 'd':
+        case 'dl': log(lib.handleDownload(identifier, as));
+            break;
+        default: cli.showHelp(0);
     }
-  });
 }
-
-
-// Save the data from a specified URL into a file in user's Dropbox.
-// Note that the transfer from the URL must complete within 5 minutes, or the operation will time out and the job will fail.
-function uploadRemoteFile (url, filePath) {
-  return axios(api.upload_remote, {
-    method: 'POST',
-    headers : {
-      Authorization,
-      'Content-Type': 'application/json',
-    },
-    data: {
-      url,
-      path: `/${filePath}`
-    }
-  });
-}
-
-// can download a file by path OR by ID
-function downloadFile (pathOrId, dlAsFileName) {
-  return axios(api.download, {
-    method: 'POST',
-    headers: {
-      Authorization,
-      'Content-Type': 'application/octet-stream',
-      'Dropbox-API-Arg': JSON.stringify({
-        path: pathOrId,
-      })
-    }
-  })
-  .then(({headers, data}) => {
-      const downloadPath = getDownloadFilePath(dlAsFileName, headers);
-      fs.writeFileSync(downloadPath, data);
-  
-      console.log('Saved file:', downloadPath);
-      return downloadPath;
-  });
-}
-
-// https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
-function downloadImage (pathOrId, dlAsFileName) {
-  return axios(api.download, {
-    method: 'POST',
-    responseType: 'stream',
-    headers: {
-      Authorization,
-      'Content-Type': 'application/octet-stream',
-      'Dropbox-API-Arg': JSON.stringify({
-        path: pathOrId,
-      })
-    }
-  })
-  .then(({data, headers}) => {
-    // return promise to be resolved on writestream finish.
-    return new Promise((resolve, reject) => {
-      const downloadPath = getDownloadFilePath(dlAsFileName, headers);
-      const writer = fs.createWriteStream(downloadPath);
-  
-      writer.on('error', reject);
-      writer.on('finish', () => {
-        console.log('Saved image:', downloadPath);
-        resolve(downloadPath);
-      });
-  
-      // begin!!
-      data.pipe(writer);
-    });
-  });
-}
-
-//TESTED
-// log(getFileMetaByName('haha-nice.txt.txt'));
-// log(getFolderContents(''));
-// log(uploadLocalFile('./test.txt', 'haha-nice.txt'));
-// log(uploadRemoteFile(
-//   'https://www.mixdownmag.com.au/sites/default/files/styles/flexslider_h400/public/images/Stu Main.jpg',
-//   'stewart.jpg'
-// ));
-// downloadFile('/haha-nice.txt.txt')
-// downloadImage('/remooote.png', 'new-name.png')
-//UNTESTED
-
 
 function log (p) {
-  p.then(r => console.log(r.data))
-  .catch(e => console.error(e));
+    p.then(r => console.log(JSON.stringify(r.data, null, 2)))
+    .catch(console.error);
 }
 
-// Save downloaded file as name that user inputs
-// if user inputs no name, save as filename from dropbox
-function getDownloadFilePath (inputName, headers) {
-  const fileName = inputName || (function () {
-    const headersJson = JSON.parse(headers['dropbox-api-result']);
-    const headerArr = headersJson.path_display.split('/');
-    return headerArr[headerArr.length - 1];
-  }());
-  const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
-  return downloadPath;
-}
+doAction();

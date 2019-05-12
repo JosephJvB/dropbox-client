@@ -1,14 +1,17 @@
 {
-  "name": "drop-box",
-  "version": "1.0.0",
-  "description": "",
+  "name": "jvb-db",
+  "version": "0.0.0",
+  "description": "drop it like its hot",
+  "bin": {
+    "dbx": "node index.js"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Me",
+  "license": "Mine thanks",
   "dependencies": {
     "axios": "^0.18.0"
   }
