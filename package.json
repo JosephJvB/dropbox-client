@@ -1,9 +1,9 @@
 {
   "name": "jvb-dbx-cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "drop it like its hot",
   "bin": {
-    "dbx": "node index.js"
+    "dbx": "index.js"
   },
   "main": "index.js",
   "scripts": {
