@@ -150,11 +150,13 @@ function handleDownload (fileId, saveAsName) {
       }
     }))
     .catch(e => {
-      console.error('error getting file to download');
+      // 500
+      console.error('Error downloading file:', res.data.name, res.data.id);
       throw new Error(e);
     })
   })
   .catch(e => {
+    // most likely 400 - bad request. Swallow error
     console.error('Failed to get file to download', fileId);
   })
 }
