@@ -75,7 +75,7 @@ function uploadRemoteFile (url, filePath) {
 }
 
 // can download a file by path OR by ID
-function downloadFile (pathOrId, saveName) {
+function downloadFile (pathOrId, dlAsFileName) {
   return axios(api.download, {
     method: 'POST',
     headers: {
@@ -87,19 +87,16 @@ function downloadFile (pathOrId, saveName) {
     }
   })
   .then(({headers, data}) => {
-    // if no saveName: parse headers and save as dropbox fileName
-    const fileName = saveName || getFileNameFromHeaders(headers);
-
-    const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
-    fs.writeFileSync(downloadPath, data);
-
-    console.log('Saved file:', downloadPath);
-    return downloadPath;
+      const downloadPath = getDownloadFilePath(dlAsFileName, headers);
+      fs.writeFileSync(downloadPath, data);
+  
+      console.log('Saved file:', downloadPath);
+      return downloadPath;
   });
 }
 
 // https://futurestud.io/tutorials/download-files-images-with-axios-in-node-js
-function downloadImage (pathOrId, saveName) {
+function downloadImage (pathOrId, dlAsFileName) {
   return axios(api.download, {
     method: 'POST',
     responseType: 'stream',
@@ -112,15 +109,20 @@ function downloadImage (pathOrId, saveName) {
     }
   })
   .then(({data, headers}) => {
-    const fileName = saveName || getFileNameFromHeaders(headers);
-
-    const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
-    const writer = fs.createWriteStream(downloadPath);
-    writer.on('finish', () => console.log('Saved image:', downloadPath));
-    writer.on('error', e => console.error('WriteStream Error:', e));
-
-    data.pipe(writer);
-    return downloadPath;
+    // return promise to be resolved on writestream finish.
+    return new Promise((resolve, reject) => {
+      const downloadPath = getDownloadFilePath(dlAsFileName, headers);
+      const writer = fs.createWriteStream(downloadPath);
+  
+      writer.on('error', reject);
+      writer.on('finish', () => {
+        console.log('Saved image:', downloadPath);
+        resolve(downloadPath);
+      });
+  
+      // begin!!
+      data.pipe(writer);
+    });
   });
 }
 
@@ -132,7 +134,7 @@ function downloadImage (pathOrId, saveName) {
 //   'https://www.mixdownmag.com.au/sites/default/files/styles/flexslider_h400/public/images/Stu Main.jpg',
 //   'stewart.jpg'
 // ));
-// downloadFile('/haha-nice.txt.txt');
+// downloadFile('/haha-nice.txt.txt')
 // downloadImage('/remooote.png', 'new-name.png')
 //UNTESTED
 
@@ -142,8 +144,14 @@ function log (p) {
   .catch(e => console.error(e));
 }
 
-function getFileNameFromHeaders (headers) {
-  const headersJson = JSON.parse(headers['dropbox-api-result']);
-  const headArr = headersJson.path_display.split('/');
-  return headArr[headArr.length - 1];
+// Save downloaded file as name that user inputs
+// if user inputs no name, save as filename from dropbox
+function getDownloadFilePath (inputName, headers) {
+  const fileName = inputName || (function () {
+    const headersJson = JSON.parse(headers['dropbox-api-result']);
+    const headerArr = headersJson.path_display.split('/');
+    return headerArr[headerArr.length - 1];
+  }());
+  const downloadPath = path.join(os.homedir(), 'Downloads', fileName);
+  return downloadPath;
 }
