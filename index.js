@@ -29,20 +29,18 @@ const helpText = `
     Usage
     dbx [action] [options]
 
-    [Get]
-    dbx gc [path/id]  get folder contents
-    dbx gm [path/id]  get file/folder meta-data
+    get-contents: [gc]
+        dbx get-contents [path/id]
 
-    -- cannot get meta-data at root path --
+    get-meta: [gm]
+        dbx get-meta [path/id]
+        -- cannot get meta-data at root path --
 
+    upload: [u, up]
+        dbx u [local-file-path/url] --as new-db-file.txt
 
-    [Upload]
-    dbx ul ./file.txt --as new-db-file.txt  upload local
-    dbx ur https://file.txt --as new-db-file.txt  upload remote
-
-
-    [Download]
-    dbx D [file-path/id]  --as new-local-file.txt  download
+    download: [d, dl, down]
+        dbx D [file-path/id]  --as new-local-file.txt
 
     nb: --as flags are optional
 `;
@@ -57,22 +55,20 @@ if(!action) {
 }
 
 switch(action.toLowerCase()) {
-    case 'get-meta':
-    case 'gm': log(lib.getMetaData(identifier));
+    case 'gm':
+    case 'get-meta': log(lib.getMetaData(identifier));
         break;
-    case 'get-contents':
-    case 'gc': log(lib.getFolderContents(identifier));
+    case 'gc':
+    case 'get-contents': log(lib.getFolderContents(identifier));
         break;
+    case 'u':
     case 'up':
-    case 'up-l':
-    case 'ul': log(lib.uploadLocalFile(identifier, as));
-        break;
-    case 'up-r':
-    case 'up-url':
-    case 'ur': log(lib.uploadRemoteFile(identifier, as));
+    case 'upload': log(lib.handleUpload(identifier, as));
         break;
     case 'd':
-    case 'dl': log(lib.handleDownload(identifier, as));
+    case 'dl':
+    case 'down':
+    case 'download': log(lib.handleDownload(identifier, as));
         break;
     case 'auth': setTokenPrompt()
         break;

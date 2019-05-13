@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const url = require('url');
 
 const env = require('./env.json');
 // endpoints from https://www.dropbox.com/developers/documentation/http/documentation
@@ -12,8 +13,7 @@ const Authorization = `Bearer ${env.app_token}`;
 module.exports = {
   getMetaData,
   getFolderContents,
-  uploadLocalFile,
-  uploadRemoteFile,
+  handleUpload,
   handleDownload
 };
 
@@ -73,6 +73,15 @@ function uploadRemoteFile (url, filePath) {
       path: `/${filePath}`
     }
   });
+}
+
+function handleUpload (fileString, saveAsName) {
+  // assume if fileString starts with '[string]:// it is url
+  const isUrl = !!url.parse(fileString).protocol;
+
+  const uploadFn = isUrl ? uploadRemoteFile : uploadLocalFile;
+
+  return uploadFn(fileString, saveAsName);
 }
 
 // can download a file by path OR by ID

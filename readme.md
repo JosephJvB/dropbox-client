@@ -14,6 +14,8 @@ home-brewed programmatic dropbox client.
 
 ### TODO
 - create handleUpload to manage the two upload functions
+    - draft done, need to test
+- split lib.js into modules under `/lib/`
 - make CLI nicer
     - spinners: [ora](https://github.com/sindresorhus/ora)
     - scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
