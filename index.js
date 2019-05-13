@@ -1,9 +1,7 @@
 #! /usr/bin/env node
-const meow = require('meow');
+const lib = require('./lib');
 
-const lib = require('./lib')
-
-const cli = meow(`
+const helpText = `
     Usage
     dbx [action] [options]
 
@@ -23,23 +21,15 @@ const cli = meow(`
     dbx D [file-path/id]  --as new-local-file.txt  download
 
     nb: --as flags are optional
-`, {
-    flags: {
-        help: {
-            type: 'boolean',
-            alias: 'h'
-        },
-        as: {
-            type: 'string',
-            default: null
-        }
-    }
-});
+`;
+const inputArgs = process.argv.slice(2);
 
-const [action, identifier] = cli.input;
-const as = cli.flags.as;
+const [action, identifier] = inputArgs;
+const asIdx = inputArgs.findIndex(a => a === '--as');
+const as = asIdx > 0 ? inputArgs[asIdx + 1] : null;
+
 if(!action) {
-    return cli.showHelp(0); // exit on error code 0 (swallow)
+    return console.log(helpText)
 }
 
 switch(action.toLowerCase()) {
@@ -58,7 +48,7 @@ switch(action.toLowerCase()) {
     case 'd':
     case 'dl': log(lib.handleDownload(identifier, as));
         break;
-    default: cli.showHelp(0);
+    default: console.log(helpText)
 }
 
 function log (p) {

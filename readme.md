@@ -18,5 +18,7 @@ home-brewed programmatic dropbox client.
     - spinners: [ora](https://github.com/sindresorhus/ora)
     - scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
     - maybe download lets you view available files before choosing one?
+    - remove Meow for Commander + inquirer
+    - cli to add dropbox token which will do a writefile.
 - Create something tidier than current log function.
 - Batch upload/download?
