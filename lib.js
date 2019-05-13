@@ -81,7 +81,10 @@ function handleUpload (fileString, saveAsName) {
 
   const uploadFn = isUrl ? uploadRemoteFile : uploadLocalFile;
 
-  return uploadFn(fileString, saveAsName);
+  const pathArr = fileString.split('/');
+  const dropboxFileName = saveAsName || pathArr[pathArr.length - 1];
+
+  return uploadFn(fileString, dropboxFileName);
 }
 
 // can download a file by path OR by ID
@@ -98,7 +101,7 @@ function downloadFile (docId, downloadPath) {
   })
   .then(res => {
       fs.writeFileSync(downloadPath, res.data);
-  
+      
       return res;
   });
 }
@@ -133,6 +136,8 @@ function downloadImage (docId, downloadPath) {
 }
 
 // fileId can be dropbox ID or dropbox filepath
+// TODO: fix
+// wrong! it can only be file path atm
 function handleDownload (fileId, saveAsName) {
   // find req download file meta data before attempting to DL
   return getMetaData(fileId)

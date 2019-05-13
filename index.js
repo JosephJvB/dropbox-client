@@ -6,24 +6,24 @@ const lib = require('./lib');
 
 const envPath = path.join(__dirname, 'test.env.json');
 
-function setTokenPrompt () {
-    console.log('please enter your authToken');
-    const token = "token";
+// function setTokenPrompt () {
+//     console.log('please enter your authToken');
+//     const token = "token";
 
-    const envJson = JSON.stringify({app_token: token}, null, 2);
-    fs.writeFileSync(envPath, envJson);
-    return;
-}
+//     const envJson = JSON.stringify({app_token: token}, null, 2);
+//     fs.writeFileSync(envPath, envJson);
+//     return;
+// }
 
-// set token if not exists
-if(fs.existsSync(envPath)) {
-    const env = fs.readFileSync(envPath);
-    if(!env.app_token) {
-        setTokenPrompt();
-    }
-} else {
-    setTokenPrompt();
-}
+// // set token if not exists
+// if(fs.existsSync(envPath)) {
+//     const env = fs.readFileSync(envPath);
+//     if(!env.app_token) {
+//         setTokenPrompt();
+//     }
+// } else {
+//     setTokenPrompt();
+// }
 
 const helpText = `
     Usage
