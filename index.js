@@ -1,5 +1,29 @@
 #! /usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+
 const lib = require('./lib');
+
+const envPath = path.join(__dirname, 'test.env.json');
+
+function setTokenPrompt () {
+    console.log('please enter your authToken');
+    const token = "token";
+
+    const envJson = JSON.stringify({app_token: token}, null, 2);
+    fs.writeFileSync(envPath, envJson);
+    return;
+}
+
+// set token if not exists
+if(fs.existsSync(envPath)) {
+    const env = fs.readFileSync(envPath);
+    if(!env.app_token) {
+        setTokenPrompt();
+    }
+} else {
+    setTokenPrompt();
+}
 
 const helpText = `
     Usage
@@ -33,8 +57,10 @@ if(!action) {
 }
 
 switch(action.toLowerCase()) {
+    case 'get-meta':
     case 'gm': log(lib.getMetaData(identifier));
         break;
+    case 'get-contents':
     case 'gc': log(lib.getFolderContents(identifier));
         break;
     case 'up':
@@ -47,6 +73,8 @@ switch(action.toLowerCase()) {
         break;
     case 'd':
     case 'dl': log(lib.handleDownload(identifier, as));
+        break;
+    case 'auth': setTokenPrompt()
         break;
     default: console.log(helpText)
 }
