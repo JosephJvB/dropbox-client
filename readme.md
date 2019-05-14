@@ -12,10 +12,10 @@ home-brewed programmatic dropbox client.
 - Add base CLI framework [meow](https://www.npmjs.com/package/meow)
 - Download image / file controlled by handleDownload
 - create handleUpload to manage the two upload functions
+- split lib.js into modules under `/lib/`
 
 ### TODO
 - handle dropbox token with writefile if no token exists.
-- split lib.js into modules under `/lib/`
 - make commandline-list-interface for download function.
 - make CLI nicer
     - spinners: [ora](https://github.com/sindresorhus/ora)
