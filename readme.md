@@ -13,9 +13,10 @@ home-brewed programmatic dropbox client.
 - Download image / file controlled by handleDownload
 - create handleUpload to manage the two upload functions
 - split lib.js into modules under `/lib/`
+- handle dropbox token with writefile if no token exists.
+    - use prompts.js to handle: prompts is nice!
 
 ### TODO
-- handle dropbox token with writefile if no token exists.
 - make commandline-list-interface for download function.
 - make CLI nicer
     - spinners: [ora](https://github.com/sindresorhus/ora)
