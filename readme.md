@@ -1,6 +1,9 @@
 # Filessss
 
 home-brewed programmatic dropbox client.
+Just found this https://github.com/andreafabrizi/Dropbox-Uploader
+
+Please use this package instead of mine, thanks!
 
 ### DONE
 - Get single file meta-data
