@@ -47,7 +47,7 @@ const envPath = path.join(__dirname, 'env.json');
     const asIdx = inputArgs.findIndex(a => a === '--as');
     const as = asIdx > 0 ? inputArgs[asIdx + 1] : null;
     const helpArgs = ['-h', 'help'];
-    const help = inputArgs.find(a => helpArgs.includes(a.toLowerCase()); 
+    const help = inputArgs.find(a => helpArgs.includes(a.toLowerCase())); 
 
     if(!action || help) {
         return console.log(helpText);
@@ -71,16 +71,20 @@ const envPath = path.join(__dirname, 'env.json');
         case 'down':
         case 'download': log(lib.handleDownload(identifier, as));
             break;
-        case 'auth': setTokenPrompt()
+        case 'auth': setTokenPrompt();
             break;
-        default: console.log(helpText)
+        default: console.log(helpText);
     }
 })();
 
 
 function log (p) {
-    p.then(r => console.log(JSON.stringify(r.data, null, 2)))
-    .catch(console.error);
+    p.then(r => {
+        console.log(JSON.stringify(r.data, null, 2));
+    })
+    .catch(e => {
+        console.error(e);
+    });
 }
 
 async function promptSetToken () {
