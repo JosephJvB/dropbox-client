@@ -2,6 +2,10 @@
   "name": "jvb-dbx-cli",
   "version": "0.0.2",
   "description": "drop it like its hot",
+  "repository": {
+    "url": "https://github.com/JosephJvB/dropbbox-client",
+    "type": "git"
+  },
   "bin": {
     "dbx": "index.js"
   },
@@ -14,6 +18,6 @@
   "license": "Mine thanks",
   "dependencies": {
     "axios": "^0.18.0",
-    "meow": "^5.0.0"
+    "prompts": "^2.0.4"
   }
 }
