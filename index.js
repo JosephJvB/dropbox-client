@@ -4,7 +4,7 @@ const path = require('path');
 const prompts = require('prompts');
 
 const lib = require('./lib');
-const envPath = path.join(__dirname, 'test.env.json');
+const envPath = path.join(__dirname, 'env.json');
 
 // make async to await token prompt
 (async function init() {
