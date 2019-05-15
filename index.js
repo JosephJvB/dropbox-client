@@ -3,7 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
 
-const lib = require('./lib');
+// hack to avoid loading ./lib before env.json exists, else error
+// see line 55
+const loadLib = () => require('./lib');
 const envPath = path.join(__dirname, 'env.json');
 
 // make async to await token prompt
@@ -48,7 +50,9 @@ const envPath = path.join(__dirname, 'env.json');
     if(!action) {
         return console.log(helpText);
     }
-    
+ 
+    // hack here
+    const lib = loadLib();
     switch(action.toLowerCase()) {
         case 'gm':
         case 'get-meta': log(lib.getMetaData(identifier));
