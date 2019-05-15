@@ -4,7 +4,7 @@ const path = require('path');
 const prompts = require('prompts');
 
 // hack to avoid loading ./lib before env.json exists, else error
-// see line 55
+// see line above switch statement
 const loadLib = () => require('./lib');
 const envPath = path.join(__dirname, 'env.json');
 
@@ -46,8 +46,10 @@ const envPath = path.join(__dirname, 'env.json');
     const [action, identifier] = inputArgs;
     const asIdx = inputArgs.findIndex(a => a === '--as');
     const as = asIdx > 0 ? inputArgs[asIdx + 1] : null;
-    
-    if(!action) {
+    const helpArgs = ['-h', 'help'];
+    const help = inputArgs.find(a => helpArgs.includes(a.toLowerCase()); 
+
+    if(!action || help) {
         return console.log(helpText);
     }
  
