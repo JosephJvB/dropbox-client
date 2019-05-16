@@ -84,7 +84,8 @@ function log (p) {
         console.log(JSON.stringify(r.data, null, 2));
     })
     .catch(e => {
-        console.error(e);
+        console.error('Error:', e.message);
+        console.error('\n   dbx --help to see usage')
     });
 }
 
