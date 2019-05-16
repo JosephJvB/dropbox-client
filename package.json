@@ -1,6 +1,6 @@
 {
   "name": "jvb-dbx-cli",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "drop it like its hot",
   "repository": {
     "url": "https://github.com/JosephJvB/dropbox-client",
