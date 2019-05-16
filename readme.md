@@ -53,9 +53,11 @@ Copy your generated Authorization token, you will need to enter this to authoriz
     ```
 
 ### TODO
-- make CLI nicer
-    - spinners: [ora](https://github.com/sindresorhus/ora)
-    - scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
-        - uses: [blessed](https://github.com/chjj/blessed)
+- can set a download path
+- can reset/unset authorization token
+- scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
+    - uses: [blessed](https://github.com/chjj/blessed)
+    - full scrolling, selectable UI: contents of root folder, selecting another folder gets the contents of THAT folder
+    - i dunno. I could go far with that stuff...
 - Create something tidier than current log function.
 - Batch upload/download?
