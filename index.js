@@ -1,12 +1,14 @@
 #! /usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const prompts = require('prompts');
 
 // hack to avoid loading ./lib before env.json exists, else error
 // see line above switch statement
 const loadLib = () => require('./lib');
-const envPath = path.join(__dirname, 'env.json');
+const envPath = path.join(__dirname, 'test-env.json');
+const deleteEnv = () => util.promisify(fs.unlink)(envPath);
 
 // make async to await token prompt
 (async function init() {
@@ -18,29 +20,36 @@ const envPath = path.join(__dirname, 'env.json');
     }    
     // set token if not exists
     if(!envFileExists || !tokenIsSet()) {
-        await promptSetToken();
+        await promptSetToken({required:true})
+        process.exit(0);
     }
     
     const helpText = `
         key: <> = required, [] = optional
 
         Usage:
-        dbx [action] [options]
+        dbx <action> [options]
     
         Actions:
-        list-contents: list, l
+        auth: auth:set, auth:delete
+            dbx auth:set
+            dbx auth:delete
+
+        start-interactive: int, i
+            dbx i [path]
+
+        list-contents: list, ls
             dbx list [path/id]
     
-        meta: m
+        meta: no alias
             dbx meta <path/id>
             -- cannot get meta-data at root path --
     
-        upload: u, up
-            dbx u <local-file-path/url> [--as new-db-file.txt]
+        upload: up
+            dbx up <local-file-path/url> [--as new-db-file.txt]
     
-        download: d, dl, down
+        download: down, dl
             dbx download
-            -- follow prompts to download --
     `;
 
     const cmds = [];
@@ -66,23 +75,25 @@ const envPath = path.join(__dirname, 'env.json');
     // hack here
     const lib = loadLib();
     switch(action.toLowerCase()) {
-        case 'm':
         case 'meta': log(lib.getMetaData(identifier));
             break;
-        case 'l':
+        case 'ls':
         case 'list':
         case 'list-contents': log(lib.listContents(identifier, verbose));
             break;
-        case 'u':
         case 'up':
         case 'upload': log(lib.handleUpload(identifier, saveAsName));
             break;
-        case 'd':
         case 'dl':
         case 'down':
         case 'download': log(lib.handleDownload());
             break;
-        case 'auth': setTokenPrompt();
+        case 'auth':
+        case 'auth:set': promptSetToken({required:false});
+            break;
+        case 'auth:d':
+        case 'auth:destroy':
+        case 'auth:delete': deleteEnv();
             break;
         default: console.log(helpText);
     }
@@ -100,12 +111,20 @@ function log (p) {
     });
 }
 
-async function promptSetToken () {
+async function promptSetToken ({required}) {
     const response = await prompts({
         type: 'text',
         name: 'token',
-        message: 'No Authentication token set\nEnter Dropbox Authentication token:\n'
-    })
+        message: `${required ? 'No Authorization token set\n' : ''}Enter Dropbox Authorization token:\n`
+    }, {
+        onCancel: () => {
+            const url = 'https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps';
+            if(required) {
+                console.log(`Must set token to proceed\nvisit ${url} to generate a token`);
+            }
+            process.exit(0);
+        }
+    });
 
     // call replace in case user enters token WITH "Bearer "
     // I only want the hash, I add "Bearer " at request time
