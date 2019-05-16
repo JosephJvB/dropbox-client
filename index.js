@@ -43,12 +43,21 @@ const envPath = path.join(__dirname, 'env.json');
         nb: --as flags are optional
     `;
 
-    const inputArgs = process.argv.slice(2);
-    const [action, identifier] = inputArgs;
-    const asIdx = inputArgs.findIndex(a => a === '--as');
+    const cmds = [];
+    const flags = [];
+    for(arg of process.argv.slice(2)) {
+        arg[0] === '-'
+        ? flags.push(arg)
+        : cmds.push(arg)
+    }
+    const [action, identifier] = cmds;
+    // flags
+    const asIdx = flags.findIndex(a => a === '--as');
     const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
     const helpArgs = ['-h', 'help'];
-    const help = inputArgs.find(a => helpArgs.includes(a.toLowerCase())); 
+    const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
+    const verboseArgs = ['-v', '--verbose'];
+    const verbose = flags.find(a => verboseArgs.includes(a.toLowerCase()));
 
     if(!action || help) {
         return console.log(helpText);
@@ -61,7 +70,7 @@ const envPath = path.join(__dirname, 'env.json');
         case 'meta': log(lib.getMetaData(identifier));
             break;
         case 'c':
-        case 'contents': log(lib.getFolderContents(identifier));
+        case 'contents': log(lib.getFolderContents(identifier, verbose));
             break;
         case 'u':
         case 'up':
@@ -85,7 +94,8 @@ function log (p) {
     })
     .catch(e => {
         console.error('Error:', e.message);
-        console.error('\n   dbx --help to see usage')
+        console.error('\n   dbx --help to see usage');
+        process.exit(1);
     });
 }
 
