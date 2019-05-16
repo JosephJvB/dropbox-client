@@ -22,25 +22,25 @@ const envPath = path.join(__dirname, 'env.json');
     }
     
     const helpText = `
+        key: <> = required, [] = optional
+
         Usage:
         dbx [action] [options]
     
         Actions:
-        contents: [c]
-            dbx contents [path/id]
+        list-contents: list, l
+            dbx list [path/id]
     
-        meta: [m]
-            dbx meta [path/id]
+        meta: m
+            dbx meta <path/id>
             -- cannot get meta-data at root path --
     
-        upload: [u, up]
-            dbx u [local-file-path/url] --as new-db-file.txt
+        upload: u, up
+            dbx u <local-file-path/url> [--as new-db-file.txt]
     
-        download: [d, dl, down]
+        download: d, dl, down
             dbx download
             -- follow prompts to download --
-    
-        nb: --as flags are optional
     `;
 
     const cmds = [];
@@ -69,8 +69,9 @@ const envPath = path.join(__dirname, 'env.json');
         case 'm':
         case 'meta': log(lib.getMetaData(identifier));
             break;
-        case 'c':
-        case 'contents': log(lib.getFolderContents(identifier, verbose));
+        case 'l':
+        case 'list':
+        case 'list-contents': log(lib.listContents(identifier, verbose));
             break;
         case 'u':
         case 'up':
