@@ -26,18 +26,19 @@ const envPath = path.join(__dirname, 'env.json');
         dbx [action] [options]
     
         Actions:
-        get-contents: [gc]
-            dbx get-contents [path/id]
+        contents: [c]
+            dbx contents [path/id]
     
-        get-meta: [gm]
-            dbx get-meta [path/id]
+        meta: [m]
+            dbx meta [path/id]
             -- cannot get meta-data at root path --
     
         upload: [u, up]
             dbx u [local-file-path/url] --as new-db-file.txt
     
         download: [d, dl, down]
-            dbx D [file-path/id]  --as new-local-file.txt
+            dbx download
+            -- follow prompts to download --
     
         nb: --as flags are optional
     `;
@@ -45,7 +46,7 @@ const envPath = path.join(__dirname, 'env.json');
     const inputArgs = process.argv.slice(2);
     const [action, identifier] = inputArgs;
     const asIdx = inputArgs.findIndex(a => a === '--as');
-    const as = asIdx > 0 ? inputArgs[asIdx + 1] : null;
+    const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
     const helpArgs = ['-h', 'help'];
     const help = inputArgs.find(a => helpArgs.includes(a.toLowerCase())); 
 
@@ -56,20 +57,20 @@ const envPath = path.join(__dirname, 'env.json');
     // hack here
     const lib = loadLib();
     switch(action.toLowerCase()) {
-        case 'gm':
-        case 'get-meta': log(lib.getMetaData(identifier));
+        case 'm':
+        case 'meta': log(lib.getMetaData(identifier));
             break;
-        case 'gc':
-        case 'get-contents': log(lib.getFolderContents(identifier));
+        case 'c':
+        case 'contents': log(lib.getFolderContents(identifier));
             break;
         case 'u':
         case 'up':
-        case 'upload': log(lib.handleUpload(identifier, as));
+        case 'upload': log(lib.handleUpload(identifier, saveAsName));
             break;
         case 'd':
         case 'dl':
         case 'down':
-        case 'download': log(lib.handleDownload(identifier, as));
+        case 'download': log(lib.handleDownload());
             break;
         case 'auth': setTokenPrompt();
             break;
