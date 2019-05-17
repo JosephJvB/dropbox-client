@@ -46,7 +46,7 @@ const {
     const [action, fileIdentifier] = cmds;
     const asIdx = flags.findIndex(a => a === '--as');
     const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
-    const helpArgs = ['-h', 'help'];
+    const helpArgs = ['-h', 'elp'];
     const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
 
     if(!action || help) {
@@ -57,7 +57,7 @@ const {
     const lib = loadLib();
     try {
         switch(action.toLowerCase()) {
-            case 'connect': lib.connect();
+            case 'connect': require('./lib/connect')();
                 break;
             case 'upload': lib.handleUpload(fileIdentifier, saveAsName);
                 break;
@@ -81,6 +81,7 @@ const {
                 `\n[status] ${e.response.status}\n[data] ${data}`
             );
         } else {
+            console.error(e)
             console.error('Error:', e.message);
             console.error('\n   dbx --help to see usage');
         }
