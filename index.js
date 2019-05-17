@@ -1,17 +1,16 @@
 #! /usr/bin/env node
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
-const prompts = require('prompts');
-
-const lib = require('./lib');
+const {
+    checkTokenExists,
+    promptSetToken,
+    deleteToken
+} = require('./token');
 
 // make async to await token prompt
 (async function init() {
 
-    if(!await lib.checkTokenExists()) {
+    if(!await checkTokenExists()) {
         // promptSetToken calls process.exit(0)
-        await lib.promptSetToken({required: true});
+        await promptSetToken({required: true});
     }
 
     const helpText = `
@@ -48,11 +47,12 @@ const lib = require('./lib');
  
     try {
         switch(action.toLowerCase()) {
-            case 'connect': lib.connect();
+            // hack to avoid checking ./env.json before it exists
+            case 'connect': require('./lib/connect')();
                 break;
-            case 'token:set': lib.promptSetToken({required:false});
+            case 'token:set': promptSetToken({required:false});
                 break;
-            case 'token:destroy': lib.deleteToken();
+            case 'token:destroy': deleteToken();
                 break;
             case 'error': logError();
                 break;

@@ -3,7 +3,7 @@ const path = require('path');
 const util = require('util');
 const prompts = require('prompts');
 
-const envPath = path.join(__dirname, '../env.json');
+const envPath = path.join(__dirname, 'env.json');
 
 exports.deleteToken = function deleteToken () {
   return util.promisify(fs.unlink)(envPath);
@@ -49,6 +49,5 @@ exports.promptSetToken = async function promptSetToken ({required}) {
   },null,2);
   fs.writeFileSync(envPath, envJson);
  
-  console.log('Token set: success, exiting...')
-  process.exit(0);
+  console.log('Token set ✔\n')
 }
