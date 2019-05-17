@@ -19,11 +19,7 @@ im making constant changes, the switch statement in ./index.js is the most relia
 
 
 ### TODO
+- refactor this future joe it's your problem now!!
+- use [blessed](https://github.com/chjj/blessed) to clear and rewrite in the same 'screen'
 - can set a download path
-- can reset/unset authorization token
-- scrollable select screen like in [glyrics](https://github.com/candh/glyrics)
-    - uses: [blessed](https://github.com/chjj/blessed)
-    - full scrolling, selectable UI: contents of root folder, selecting another folder gets the contents of THAT folder
-    - i dunno. I could go far with that stuff...
-- Create something tidier than current log function.
 - Batch upload/download?
