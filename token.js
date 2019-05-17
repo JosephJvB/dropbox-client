@@ -35,6 +35,7 @@ exports.promptSetToken = async function promptSetToken ({required}) {
         const url = 'https://www.dropbox.com/developers/apps';
         console.log(`Must set app-token to proceed\nVisit ${url} to generate a token`);
       }
+      console.log('bye.');
       process.exit(0);
     }
   });
@@ -47,6 +48,7 @@ exports.promptSetToken = async function promptSetToken ({required}) {
       app_token: response.token.replace('Bearer ', '')
   },null,2);
   fs.writeFileSync(envPath, envJson);
-  
+ 
+  console.log('Token set: success, exiting...')
   process.exit(0);
 }

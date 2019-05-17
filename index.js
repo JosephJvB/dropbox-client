@@ -29,10 +29,10 @@ const {
     
         dbx connect
 
+        dbx upload <local-file-path/url> [--as new-db-file.txt]
+
         dbx token:set
         dbx token:destroy
-
-        dbx upload <local-file-path/url> [--as new-db-file.txt]
     `;
 
     // flags start with '-', everything else a command
@@ -43,7 +43,9 @@ const {
         ? flags.push(arg)
         : cmds.push(arg)
     }
-    const [action] = cmds;
+    const [action, fileIdentifier] = cmds;
+    const asIdx = flags.findIndex(a => a === '--as');
+    const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
     const helpArgs = ['-h', 'help'];
     const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
 
@@ -53,25 +55,54 @@ const {
  
     // hack here
     const lib = loadLib();
-    switch(action.toLowerCase()) {
-        case 'connect': console.log('nice');
-            break;
-        case 'token:set': promptSetToken({required:false});
-            break;
-        case 'token:destroy': deleteToken();
-            break;
-        default: console.log(helpText);
+    try {
+        switch(action.toLowerCase()) {
+            case 'connect': lib.connect();
+                break;
+            case 'upload': lib.handleUpload(fileIdentifier, saveAsName);
+                break;
+            case 'token:set': promptSetToken({required:false});
+                break;
+            case 'token:destroy': deleteToken();
+                break;
+            case 'error': logError();
+                break;
+            default: console.log(helpText);
+        }
+    } catch (e) {
+        // if axios error
+        if('response' in e) {
+            // found this error shape once...
+            // and as much as I like logging [object Object], I dont.
+            const data = 'error_summary' in e.response.data
+            ? e.response.data.error_summary
+            : e.response.data;
+            console.error(
+                `\n[status] ${e.response.status}\n[data] ${data}`
+            );
+        } else {
+            console.error('Error:', e.message);
+            console.error('\n   dbx --help to see usage');
+        }
+
+        console.log('exiting...')
+        process.exit(1);
     }
 })();
 
-
-function log (p) {
-    p.then(r => {
-        console.log(JSON.stringify(r.data, null, 2));
-    })
-    .catch(e => {
-        console.error('Error:', e.message);
-        console.error('\n   dbx --help to see usage');
-        process.exit(1);
-    });
+// sick friday arvo memes with the boyes
+function logError () {
+    const opts = [
+        'Uncaught TypeError: Cannot read property "value" of undefined',
+        'VLAUE = [object Object]',
+        'Uncaught TypeError: undefined is not a function',
+        'CORS error: Cannot load https://www.youtube.com/watch?v=dQw4w9WgXcQ. No "Access-Control-Allow-Origin" header is present on the requested resource.',
+        'TypeError: Cannot read property ‘length’ of undefined',
+        '---GOT THIS FAR---',
+        'hello?',
+        'I was called'
+    ];
+    console.error(opts[Math.floor(Math.random() * opts.length)]);
+    console.log('exiting...');
+    process.exit(1);
 }
