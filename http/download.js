@@ -2,7 +2,7 @@ const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const prompts = require('prompts');
+// const prompts = require('prompts');
 
 const api = require('../api.json');
 const env = require('../env.json');
@@ -11,30 +11,32 @@ const Authorization = `Bearer ${env.app_token}`;
 module.exports = async function handleDownload (filePath = '') {
     try {
         const chosenFile = filePath.split('/').pop();
-        const renamePrompt = await prompts({
-            type: 'confirm',
-            name: 'yes',
-            message: `Rename file ${chosenFile}? [y/n]`
-        }, {
-            onCancel: () => { console.log('bye.'); process.exit(0) }
-        });
+        // const renamePrompt = await prompts({
+        //     type: 'confirm',
+        //     name: 'yes',
+        //     message: `Rename file ${chosenFile}? [y/n]`
+        // }, {
+        //     onCancel: () => { console.log('bye.'); process.exit(0) }
+        // });
 
-        // if chosen.value['.tag'] == folder start 
+        // // if chosen.value['.tag'] == folder start 
 
-        // step 2: rename file?
-        let fileName = '';
-        if(renamePrompt.yes) {
-            const renameChoice = await prompts({
-                type: 'text',
-                name: 'fileName',
-                message: 'Enter new filename:'
-            }, {
-                onCancel: () => { console.log('bye.'); process.exit(0) }
-            });
-            fileName = renameChoice.fileName;
-        } else {
-            fileName = chosenFile;
-        }
+        // // step 2: rename file?
+        // let fileName = '';
+        // if(renamePrompt.yes) {
+        //     const renameChoice = await prompts({
+        //         type: 'text',
+        //         name: 'fileName',
+        //         message: 'Enter new filename:'
+        //     }, {
+        //         onCancel: () => { console.log('bye.'); process.exit(0) }
+        //     });
+        //     fileName = renameChoice.fileName;
+        // } else {
+        //     fileName = chosenFile;
+        // }
+
+        const fileName = chosenFile;
 
         const downloadPath = path.join(
             os.homedir(),
@@ -56,7 +58,8 @@ module.exports = async function handleDownload (filePath = '') {
         // do download
         await downloadFn(filePath, downloadPath);
 
-        console.log('Download successful, exiting...');
+        console.log('   Download successful ✔\n');
+        return;
     } catch (e) {
         // assumes axios format error:
         if('response' in e) {

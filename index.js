@@ -9,9 +9,9 @@ const lib = require('./lib');
 // make async to await token prompt
 (async function init() {
 
-    if(!await checkTokenExists()) {
+    if(!await lib.checkTokenExists()) {
         // promptSetToken calls process.exit(0)
-        await promptSetToken({required: true});
+        await lib.promptSetToken({required: true});
     }
 
     const helpText = `
