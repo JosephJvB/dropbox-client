@@ -4,14 +4,7 @@ const path = require('path');
 const util = require('util');
 const prompts = require('prompts');
 
-// hack to avoid loading ./lib before env.json exists, else error
-// see line above switch statement
-const loadLib = () => require('./lib');
-const {
-    checkTokenExists,
-    promptSetToken,
-    deleteToken
-} = require('./token');
+const lib = require('./lib');
 
 // make async to await token prompt
 (async function init() {
@@ -53,17 +46,13 @@ const {
         return console.log(helpText);
     }
  
-    // hack here
-    const lib = loadLib();
     try {
         switch(action.toLowerCase()) {
-            case 'connect': require('./lib/connect')();
+            case 'connect': lib.connect();
                 break;
-            case 'upload': lib.handleUpload(fileIdentifier, saveAsName);
+            case 'token:set': lib.promptSetToken({required:false});
                 break;
-            case 'token:set': promptSetToken({required:false});
-                break;
-            case 'token:destroy': deleteToken();
+            case 'token:destroy': lib.deleteToken();
                 break;
             case 'error': logError();
                 break;
