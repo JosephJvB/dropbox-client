@@ -2,44 +2,41 @@ const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const prompts = require('prompts');
+// const prompts = require('prompts');
 
-const { getFolderContents } = require('./get-info');
 const api = require('../api.json');
 const env = require('../env.json');
 const Authorization = `Bearer ${env.app_token}`;
 
-module.exports = async function handleDownload () {
+module.exports = async function handleDownload (filePath = '') {
     try {
-        // step 1: select file to download
-        const dbxContents = await getFolderContents();
-        const chosenDLFile = await prompts({
-            type: 'text',
-            name: 'idx',
-            message: dbxContents.data.reduce((str, entry, i) => {
-                return str += `    ${i + 1}: ${entry.name}\n`
-            }, 'Select file by number:\n\n')
-        });
-        const chosen = dbxContents.data[chosenDLFile.idx - 1];
+        const chosenFile = filePath.split('/').pop();
+        // const renamePrompt = await prompts({
+        //     type: 'confirm',
+        //     name: 'yes',
+        //     message: `Rename file ${chosenFile}? [y/n]`
+        // }, {
+        //     onCancel: () => { console.log('bye.'); process.exit(0) }
+        // });
 
-        const renamePrompt = await prompts({
-            type: 'confirm',
-            name: 'yes',
-            message: `Rename file ${chosen.name}? [y/n]`
-        });
+        // // if chosen.value['.tag'] == folder start 
 
-        // step 2: rename file?
-        let fileName = '';
-        if(renamePrompt.yes) {
-            const renameChoice = await prompts({
-                type: 'text',
-                name: 'fileName',
-                message: 'Enter new filename:'
-            });
-            fileName = renameChoice.fileName;
-        } else {
-            fileName = chosen.name;
-        }
+        // // step 2: rename file?
+        // let fileName = '';
+        // if(renamePrompt.yes) {
+        //     const renameChoice = await prompts({
+        //         type: 'text',
+        //         name: 'fileName',
+        //         message: 'Enter new filename:'
+        //     }, {
+        //         onCancel: () => { console.log('bye.'); process.exit(0) }
+        //     });
+        //     fileName = renameChoice.fileName;
+        // } else {
+        //     fileName = chosenFile;
+        // }
+
+        const fileName = chosenFile;
 
         const downloadPath = path.join(
             os.homedir(),
@@ -55,24 +52,23 @@ module.exports = async function handleDownload () {
         : downloadFile;
 
         console.log(`
-            Downloading ${chosen.name}
+            Downloading ${chosenFile}
             Saving to ${downloadPath}
-        `)
+        `);
         // do download
-        await downloadFn(chosen.id, downloadPath);
+        await downloadFn(filePath, downloadPath);
 
-        return {
-            data: {
-                id: chosen.id,
-                name: fileName,
-                full_path: downloadPath,
-            }
-        };
+        console.log('   Download successful ✔\n');
+        return;
     } catch (e) {
         // assumes axios format error:
         if('response' in e) {
+            // found this error shape
+            const data = 'error_summary' in e.response.data
+            ? e.response.data.error_summary
+            : e.response.data;
             throw new Error(
-                `\n[status] ${e.response.status}\n[data]\n${e.response.data}`
+                `\n[status] ${e.response.status}\n[data] ${data}`
             );
         } else {
             // writefile error or something else
