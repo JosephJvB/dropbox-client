@@ -1,52 +1,22 @@
 const axios = require('axios');
 const fs = require('fs');
 const url = require('url');
-const prompts = require('prompts');
 
 const api = require('../api.json');
 
 module.exports = async function handleUpload (fileString, saveAsName) {
-        if(!fileString) {
-            throw new Error('No filepath / url given to upload');
-        }
-
-        const pathArr = fileString.split('/');
-        let fileName = pathArr[pathArr.length - 1];
-        if(saveAsName) {
-            fileName = saveAsName;
-        } else {
-            const renamePrompt = await prompts({
-                type: 'confirm',
-                name: 'yes',
-                message: `Rename file ${fileName}? [y/n]`
-            }, {
-                onCancel: () => { console.log('bye.'); process.exit(0) }
-            });
-            if(renamePrompt.yes) {
-                const renameChoice = await prompts({
-                    type: 'text',
-                    name: 'fileName',
-                    message: 'Enter new fileName:'
-                }, {
-                    onCancel: () => { console.log('bye.'); process.exit(0) }
-                });
-                fileName = renameChoice.fileName;
-            }
-        }
-        
         // assume if fileString starts with '[string]:// it is url
         const isUrl = !!url.parse(fileString).protocol;
         const uploadFn = isUrl ? uploadRemoteFile : uploadLocalFile;
         
         console.log(`
         Uploading ${fileString}
-        Saving ${fileName} to dropbox
+        Saving ${saveAsName} to dropbox
         `);
         
-        const uploadResult = await uploadFn(fileString, fileName);
+        const uploadResult = await uploadFn(fileString, saveAsName);
         
-        console.log('Upload successful, exiting...');
-        process.exit(0);
+        console.log('Upload successful ✔\n');
 }
     
     function uploadLocalFile (localFile, filePath) {

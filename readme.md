@@ -22,9 +22,9 @@ dbx token:destroy
 
 ### TODO
 - refactor please, this is gross
+- revisit error handling
 - bring back download rename prompt
 - can set a download path
-- can upload to a folder when 'in' a folder
 - EXTRA: move files, create directories etc
 - EXTRA: instead of being select prompt, use a text prompt
   - then inside text prompt allow cmds like

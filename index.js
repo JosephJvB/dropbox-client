@@ -6,6 +6,7 @@ const {
   listFileActionsListener,
   showInfoListener,
   downloadListener,
+  // uploadListener,
   waitGoBack,
   handleExit
 } = require('./lib/event-listeners')
@@ -30,6 +31,7 @@ const {
   cli.on('LIST_FILE_ACTIONS', listFileActionsListener);
   cli.on('INFO', showInfoListener);
   cli.on('DOWNLOAD', downloadListener);
+  // cli.on('UPLOAD', uploadListener);
   cli.on('BACK', waitGoBack);
   cli.on('EXIT', handleExit);
 
