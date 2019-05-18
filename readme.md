@@ -21,7 +21,6 @@ dbx token:destroy
 
 
 ### TODO
-- refactor please, this is gross
 - revisit error handling
 - bring back download rename prompt
 - can set a download path
