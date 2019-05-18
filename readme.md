@@ -12,15 +12,24 @@ https://github.com/andreafabrizi/Dropbox-Uploader
 
 ### Usage:
 ```sh
-dbx <action> [file] [options]
+dbx connect
 ```
-
-im making constant changes, the switch statement in ./index.js is the most reliable source of truth.
+```sh
+dbx token:set
+dbx token:destroy
+```
 
 
 ### TODO
-- refactor this future joe it's your problem now!!
-- use [blessed](https://github.com/chjj/blessed) to clear and rewrite in the same 'screen'
-  - `console.log('\033[2J')` clears screen?
+- refactor please, this is gross
+- bring back download rename prompt
 - can set a download path
-- Batch upload/download?
+- can upload to a folder when 'in' a folder
+- EXTRA: move files, create directories etc
+- EXTRA: instead of being select prompt, use a text prompt
+  - then inside text prompt allow cmds like
+    - ls -> select file outputs info
+    - download -> select file does download
+    - upload -> upload a file to current dir
+    - cd -> changes "current file path"
+  - it's a cli in a cli
