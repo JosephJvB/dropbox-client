@@ -4,8 +4,6 @@ const url = require('url');
 const prompts = require('prompts');
 
 const api = require('../api.json');
-const env = require('../env.json');
-const Authorization = `Bearer ${env.app_token}`;
 
 module.exports = async function handleUpload (fileString, saveAsName) {
         if(!fileString) {
@@ -56,7 +54,7 @@ module.exports = async function handleUpload (fileString, saveAsName) {
         method: 'POST',
         data: fs.createReadStream(localFile),
         headers: {
-            Authorization,
+            Authorization: process.env.APP_TOKEN,
             'Content-Type': 'application/octet-stream',
             'Dropbox-Api-Arg': JSON.stringify({
                 path: `/${filePath}`,
@@ -73,7 +71,7 @@ function uploadRemoteFile (url, filePath) {
     return axios(api.upload_remote, {
         method: 'POST',
         headers : {
-            Authorization,
+            Authorization: process.env.APP_TOKEN,
             'Content-Type': 'application/json',
         },
         data: {

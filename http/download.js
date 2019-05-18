@@ -5,8 +5,6 @@ const os = require('os');
 // const prompts = require('prompts');
 
 const api = require('../api.json');
-const env = require('../env.json');
-const Authorization = `Bearer ${env.app_token}`;
 
 module.exports = async function handleDownload (filePath = '') {
     try {
@@ -84,7 +82,7 @@ async function downloadFile (docId, downloadPath) {
     const downloadResult = await axios(api.download, {
       method: 'POST',
       headers: {
-        Authorization,
+        Authorization: process.env.APP_TOKEN,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
           path: docId,
@@ -102,7 +100,7 @@ async function downloadImage (docId, downloadPath) {
         method: 'POST',
         responseType: 'stream',
         headers: {
-            Authorization,
+            Authorization: process.env.APP_TOKEN,
             'Content-Type': 'application/octet-stream',
             'Dropbox-API-Arg': JSON.stringify({
                 path: docId,

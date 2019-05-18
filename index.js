@@ -1,98 +1,73 @@
 #! /usr/bin/env node
+const eventEmitter = require('events');
+
 const {
-    checkTokenExists,
-    promptSetToken,
-    deleteToken
-} = require('./token');
+  listContentsListener,
+  listFileActionsListener,
+  showInfoListener,
+  downloadListener,
+  waitGoBack,
+  handleExit
+} = require('./lib/event-listeners')
 
-// make async to await token prompt
-(async function init() {
+const {
+  checkTokenExists,
+  promptSetToken,
+  loadToken,
+  deleteToken
+} = require('./lib/token');
 
-    if(!await checkTokenExists()) {
-        // promptSetToken calls process.exit(0)
-        await promptSetToken({required: true});
-    }
+(async function init () {
+  // load token to process.env
+  if(!await checkTokenExists()) {
+    await promptSetToken({required: true});
+  }
+  await loadToken();
 
-    const helpText = `
-        key: <> = required, [] = optional
+  // register listeners
+  const cli = new eventEmitter();
+  cli.on('LIST_CONTENTS', listContentsListener);
+  cli.on('LIST_FILE_ACTIONS', listFileActionsListener);
+  cli.on('INFO', showInfoListener);
+  cli.on('DOWNLOAD', downloadListener);
+  cli.on('BACK', waitGoBack);
+  cli.on('EXIT', handleExit);
 
-        Usage:
-        dbx <action> [options]
-    
-        dbx connect
+  // handle first args
+  const cmds = [];
+  const flags = [];
+  for(arg of process.argv.slice(2)) {
+      arg[0] === '-'
+      ? flags.push(arg)
+      : cmds.push(arg)
+  }
+  const [action, fileIdentifier] = cmds;
+  const asIdx = flags.findIndex(a => a === '--as');
+  const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
+  const helpArgs = ['-h', 'elp'];
+  const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
 
-        dbx upload <local-file-path/url> [--as new-db-file.txt]
-
-        dbx token:set
-        dbx token:destroy
-    `;
-
-    // flags start with '-', everything else a command
-    const cmds = [];
-    const flags = [];
-    for(arg of process.argv.slice(2)) {
-        arg[0] === '-'
-        ? flags.push(arg)
-        : cmds.push(arg)
-    }
-    const [action, fileIdentifier] = cmds;
-    const asIdx = flags.findIndex(a => a === '--as');
-    const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
-    const helpArgs = ['-h', 'elp'];
-    const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
-
-    if(!action || help) {
-        return console.log(helpText);
-    }
- 
-    try {
-        switch(action.toLowerCase()) {
-            // hack to avoid checking ./env.json before it exists
-            case 'connect': require('./lib/connect')();
-                break;
-            case 'token:set': promptSetToken({required:false});
-                break;
-            case 'token:destroy': deleteToken();
-                break;
-            case 'error': logError();
-                break;
-            default: console.log(helpText);
-        }
-    } catch (e) {
-        // if axios error
-        if('response' in e) {
-            // found this error shape once...
-            // and as much as I like logging [object Object], I dont.
-            const data = 'error_summary' in e.response.data
-            ? e.response.data.error_summary
-            : e.response.data;
-            console.error(
-                `\n[status] ${e.response.status}\n[data] ${data}`
-            );
-        } else {
-            console.error(e)
-            console.error('Error:', e.message);
-            console.error('\n   dbx --help to see usage');
-        }
-
-        console.log('exiting...')
-        process.exit(1);
-    }
+  switch(action.toLowerCase()) {
+    case 'connect': cli.emit('LIST_CONTENTS');
+        break;
+    case 'token:set': promptSetToken({required:false});
+        break;
+    case 'token:destroy': deleteToken();
+        break;
+    case 'error': logError();
+        break;
+    default: console.log(helpText);
+  }
 })();
 
-// sick friday arvo memes with the boyes
-function logError () {
-    const opts = [
-        'Uncaught TypeError: Cannot read property "value" of undefined',
-        'VLAUE = [object Object]',
-        'Uncaught TypeError: undefined is not a function',
-        'CORS error: Cannot load https://www.youtube.com/watch?v=dQw4w9WgXcQ. No "Access-Control-Allow-Origin" header is present on the requested resource.',
-        'TypeError: Cannot read property ‘length’ of undefined',
-        '---GOT THIS FAR---',
-        'hello?',
-        'I was called'
-    ];
-    console.error(opts[Math.floor(Math.random() * opts.length)]);
-    console.log('exiting...');
-    process.exit(1);
-}
+
+var helpText = `
+  key: <> = required, [] = optional
+
+  Usage:
+
+  dbx connect
+
+  dbx token:set
+  dbx token:destroy
+`;
