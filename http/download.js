@@ -7,7 +7,7 @@ const os = require('os');
 const api = require('../api.json');
 
 module.exports = async function handleDownload (file) {
-    try {
+    // try {
         const downloadPath = path.join(
             os.homedir(),
             'Downloads',
@@ -30,21 +30,21 @@ module.exports = async function handleDownload (file) {
 
         console.log('   Download successful ✔\n');
         return;
-    } catch (e) {
-        // assumes axios format error:
-        if('response' in e) {
-            // found this error shape
-            const data = 'error_summary' in e.response.data
-            ? e.response.data.error_summary
-            : e.response.data;
-            throw new Error(
-                `\n[status] ${e.response.status}\n[data] ${data}`
-            );
-        } else {
-            // writefile error or something else
-            throw new Error(e);
-        }
-    }
+    // } catch (e) {
+    //     // assumes axios format error:
+    //     if('response' in e) {
+    //         // found this error shape
+    //         const data = 'error_summary' in e.response.data
+    //         ? e.response.data.error_summary
+    //         : e.response.data;
+    //         throw new Error(
+    //             `\n[status] ${e.response.status}\n[data] ${data}`
+    //         );
+    //     } else {
+    //         // writefile error or something else
+    //         throw new Error(e);
+    //     }
+    // }
 }
 
 // joe: struggle to find one download/writefile method that would work for both image and txt files. Split into two.

@@ -21,15 +21,16 @@ module.exports = async function awaitCmd () {
     {title: 'help', value: {evt: 'SHOW_HELP'}, type: 'cmd'},
     // i can have more than one choice doing the same event
     // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
-    ...dbxFileChoices,
-    ...navChoices
   ];
   
+  // let grabbedInput = '';
   const suggestFn = async (inputRaw, opts) => {
     if(inputRaw.length < 2) return [];
     const input = inputRaw
     .split(' ')[0] // dunno if I need this.. better save than sorry
     .toLowerCase();
+
+    // grabbedInput = input;
 
     // special cases: display options that arent the options title
     if(input === 'ls') {
@@ -43,17 +44,20 @@ module.exports = async function awaitCmd () {
           return o;
         });
     } else if(input === 'cd') {
-      return opts.filter(o => (o.type === 'folder' || o.type === 'nav')).map(o => {
-        o.value.evt = 'CHANGE_DIR';
-        return o;
-      });
+      return [
+        ...dbxFileChoices.filter(o => o.type === 'folder').map(o => {
+          o.value.evt = 'CHANGE_DIR';
+          return o;
+        }),
+        ...navChoices
+      ];
     } else if ('info'.includes(input)) {
-      return opts.filter(o => (o.type === 'folder' || o.type ==='file')).map(o => {
+      return dbxFileChoices.map(o => {
         o.value.evt = 'INFO';
         return o;
       });
     } else if ('download'.includes(input)) {
-      return opts.filter(o => o.type ==='file').map(o => {
+      return dbxFileChoices.filter(o => o.type ==='file').map(o => {
         o.value.evt = 'DOWNLOAD';
         return o;
       });
@@ -86,6 +90,7 @@ module.exports = async function awaitCmd () {
   });
   
   if(hasCancelled) {
+    hasCancelled = false;
     setTimeout(() => console.log('"quit" to exit the cli'), 50);
     this.emit('CLEAR_SCREEN');
     return;

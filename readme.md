@@ -19,6 +19,12 @@ dbx token:destroy
 
 
 ### TODO
-- upload broken
-- info broken
-- im pretty frazzled I will fix this mess soon.
+- ??
+- can set a download path
+- suggestFn: remove.map()'s  remove if-else-if
+  - grab input line 26
+  - use input and value.type to determine the event
+    - switch statement after prompt
+    - ls + file = info
+    = ls + 
+- mkdir, mv, delete functions
