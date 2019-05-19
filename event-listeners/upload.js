@@ -39,5 +39,5 @@ module.exports = async function upload () {
 
   // update cache @ cwd
   await setCache(cache.cwd, true);
-  this.emit('CLEAR_SCREEN');
+  this.emit('AWAIT_CMD');
 }

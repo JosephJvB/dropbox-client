@@ -40,5 +40,5 @@ module.exports = async function download (file) {
 
   await dbxRequest.download(file);
 
-  this.emit('AWAIT_TEXT');
+  this.emit('AWAIT_CMD');
 }
