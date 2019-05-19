@@ -6,40 +6,12 @@ const os = require('os');
 
 const api = require('../api.json');
 
-module.exports = async function handleDownload (filePath = '') {
-    try {
-        const chosenFile = filePath.split('/').pop();
-        // const renamePrompt = await prompts({
-        //     type: 'confirm',
-        //     name: 'yes',
-        //     message: `Rename file ${chosenFile}? [y/n]`
-        // }, {
-        //     onCancel: () => { console.log('bye.'); process.exit(0) }
-        // });
-
-        // // if chosen.value['.tag'] == folder start 
-
-        // // step 2: rename file?
-        // let fileName = '';
-        // if(renamePrompt.yes) {
-        //     const renameChoice = await prompts({
-        //         type: 'text',
-        //         name: 'fileName',
-        //         message: 'Enter new filename:'
-        //     }, {
-        //         onCancel: () => { console.log('bye.'); process.exit(0) }
-        //     });
-        //     fileName = renameChoice.fileName;
-        // } else {
-        //     fileName = chosenFile;
-        // }
-
-        const fileName = chosenFile;
-
+module.exports = async function handleDownload (file) {
+    // try {
         const downloadPath = path.join(
             os.homedir(),
             'Downloads',
-            fileName
+            file.name
         );
 
         const imageExts = ['jpg', 'jpeg', 'png', 'svg', 'gif', 'webP'];
@@ -50,29 +22,29 @@ module.exports = async function handleDownload (filePath = '') {
         : downloadFile;
 
         console.log(`
-            Downloading ${chosenFile}
+            Downloading ${file.name}
             Saving to ${downloadPath}
         `);
         // do download
-        await downloadFn(filePath, downloadPath);
+        await downloadFn(file.id, downloadPath);
 
         console.log('   Download successful ✔\n');
         return;
-    } catch (e) {
-        // assumes axios format error:
-        if('response' in e) {
-            // found this error shape
-            const data = 'error_summary' in e.response.data
-            ? e.response.data.error_summary
-            : e.response.data;
-            throw new Error(
-                `\n[status] ${e.response.status}\n[data] ${data}`
-            );
-        } else {
-            // writefile error or something else
-            throw new Error(e);
-        }
-    }
+    // } catch (e) {
+    //     // assumes axios format error:
+    //     if('response' in e) {
+    //         // found this error shape
+    //         const data = 'error_summary' in e.response.data
+    //         ? e.response.data.error_summary
+    //         : e.response.data;
+    //         throw new Error(
+    //             `\n[status] ${e.response.status}\n[data] ${data}`
+    //         );
+    //     } else {
+    //         // writefile error or something else
+    //         throw new Error(e);
+    //     }
+    // }
 }
 
 // joe: struggle to find one download/writefile method that would work for both image and txt files. Split into two.
