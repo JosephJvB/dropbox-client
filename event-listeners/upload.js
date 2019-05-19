@@ -1,9 +1,10 @@
 const prompts = require('prompts');
 
 const dbxRequest = require('../http');
+const { setCache, getCache } = require('../lib/cache');
 
-module.exports = async function upload (evt) {
-  const cache = this.emit('GET_CACHE')
+module.exports = async function upload () {
+  const cache = getCache();
   console.log('Uploading to ', cache.cwd);
 
   let uploadCancelled = false;
@@ -37,6 +38,6 @@ module.exports = async function upload (evt) {
   await dbxRequest.upload(chosen.fileReference, fileName);
 
   // update cache @ cwd
-  this.emit('SET_CACHE', {cwd: cache.cwd}, true)
+  await setCache(cache.cwd, true);
   this.emit('CLEAR_SCREEN');
 }

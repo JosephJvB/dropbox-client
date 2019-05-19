@@ -1,25 +1,19 @@
 const prompts = require('prompts');
 
+const { getCache } = require('../lib/cache');
+
 const defaultMsg = 'cli@dbx~$';
 
 // let cache
 
 module.exports = async function awaitCmd () {
 
-  const cache = this.emit('GET_CACHE');
+  const cache = getCache();
 
-  const currentChoices = cache[cache.cwd]
-  ? cache[cache.cwd].map(doc => {
-    return {
-      title: `${doc.name}${doc['.tag'] === 'folder' ? '/' : ''}`,
-      value: { ...doc, evt: '', cwd: cache.cwd },
-      type: doc['.tag'],
-    };
-  })
-  : [];
+  const currentChoices = cache[cache.cwd] ? cache[cache.cwd] : [];
 
   const choices = [
-    {title: 'upload', value: {evt: 'UPLOAD', cwd: cache.cwd}, type: 'cmd'},
+    {title: 'upload', value: {evt: 'UPLOAD'}, type: 'cmd'},
     {title: 'quit', value: {evt: 'QUIT'}, type: 'cmd'},
     // i can have more than one choice doing the same event
     // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
@@ -34,10 +28,19 @@ module.exports = async function awaitCmd () {
     .toLowerCase();
 
     // special cases: display options that arent the options title
-    if(input === 'cd') {
+    if(input === 'ls') {
+      // only show file / folder options
+      return currentChoices.map(o => {
+          if(o.type === 'folder') {
+            o.value.evt = 'CHANGE_DIR';
+          } else if (o.type === 'file') {
+            o.value.evt = 'INFO';
+          }
+        });
+    } else if(input === 'cd') {
       return [
         ...opts.filter(o => o.type === 'folder').map(o => {
-          o.value.evt = 'SET_CACHE';
+          o.value.evt = 'CHANGE_DIR';
           return o;
         }),
         {title: '..', value: {evt: 'BACK', cwd: cache.cwd}, type: 'cmd'},
@@ -55,7 +58,14 @@ module.exports = async function awaitCmd () {
       });
     } else {
       // display valid options by title
-      return opts.filter(o => o.title.includes(input));
+      return opts.filter(o => o.title.includes(input)).map(o => {
+        if(o.type === 'folder') {
+          o.value.evt = 'CHANGE_DIR';
+        } else if (o.type === 'file') {
+          o.value.evt = 'INFO';
+        }
+        return o;
+      });
     }
   }
 
@@ -74,7 +84,7 @@ module.exports = async function awaitCmd () {
   });
   
   if(hasCancelled) {
-    setTimeout(() => console.log('"quit" to exit the cli, or double tap ctrl+c'), 50);
+    setTimeout(() => console.log('"quit" to exit the cli'), 50);
     this.emit('CLEAR_SCREEN');
     return;
   }
@@ -87,8 +97,6 @@ module.exports = async function awaitCmd () {
     this.emit('AWAIT_CMD');
     return;
   }
-
-  console.log(chosenCmd.value.evt)
   
   // add check: if !evts.includes(chosen.evt) error:
   this.emit(chosenCmd.value.evt, chosenCmd.value);
