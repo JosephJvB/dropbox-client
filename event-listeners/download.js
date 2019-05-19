@@ -1,4 +1,4 @@
-// const prompts = require('prompts')
+const prompts = require('prompts')
 
 const dbxRequest = require('../http');
 

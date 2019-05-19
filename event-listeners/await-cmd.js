@@ -36,6 +36,7 @@ module.exports = async function awaitCmd () {
           } else if (o.type === 'file') {
             o.value.evt = 'INFO';
           }
+          return o;
         });
     } else if(input === 'cd') {
       return [

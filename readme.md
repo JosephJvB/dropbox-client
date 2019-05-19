@@ -1,5 +1,3 @@
-# Dropbox-cli
-
 Please use this package instead of mine, thanks!  
 https://github.com/andreafabrizi/Dropbox-Uploader
 
@@ -21,14 +19,6 @@ dbx token:destroy
 
 
 ### TODO
-- revisit error handling
-- bring back download rename prompt
-- can set a download path
-- EXTRA: move files, create directories etc
-- EXTRA: instead of being select prompt, use a text prompt
-  - then inside text prompt allow cmds like
-    - ls -> select file outputs info
-    - download -> select file does download
-    - upload -> upload a file to current dir
-    - cd -> changes "current file path"
-  - it's a cli in a cli
+- upload broken
+- info broken
+- im pretty frazzled I will fix this mess soon.

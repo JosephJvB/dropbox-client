@@ -1,13 +1,13 @@
 const { setCache, getCache } = require('../lib/cache');
 
 exports.changeDir = async function changeDir (file) {
-  await setCache(file.value.path_lower);
+  await setCache(file.path_lower);
   this.emit('CLEAR_SCREEN');
   return;
 }
 exports.back = async function back (file) {
-  if(file.value.path_lower) {
-    await setCache(getPrevDir(file.value.path_lower));
+  if(file.path_lower) {
+    await setCache(getPrevDir(file.path_lower));
   } else {
     await setCache('');
   }
