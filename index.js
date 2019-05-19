@@ -1,22 +1,11 @@
 #! /usr/bin/env node
-const eventEmitter = require('events');
-
-const {
-  listContentsListener,
-  listFileActionsListener,
-  showInfoListener,
-  downloadListener,
-  // uploadListener,
-  waitGoBack,
-  handleExit
-} = require('./lib/event-listeners')
-
 const {
   checkTokenExists,
   promptSetToken,
   loadToken,
   deleteToken
 } = require('./lib/token');
+const connectCli = require('./lib/connect');
 
 (async function init () {
   // load token to process.env
@@ -24,17 +13,6 @@ const {
     await promptSetToken({required: true});
   }
   await loadToken();
-
-  // register listeners
-  const cli = new eventEmitter();
-  cli.on('LIST_CONTENTS', listContentsListener);
-  cli.on('LIST_FILE_ACTIONS', listFileActionsListener);
-  cli.on('INFO', showInfoListener);
-  cli.on('DOWNLOAD', downloadListener);
-  // cli.on('UPLOAD', uploadListener);
-  cli.on('BACK', waitGoBack);
-  cli.on('EXIT', handleExit);
-
   // handle first args
   const cmds = [];
   const flags = [];
@@ -43,14 +21,16 @@ const {
       ? flags.push(arg)
       : cmds.push(arg)
   }
-  const [action, fileIdentifier] = cmds;
-  const asIdx = flags.findIndex(a => a === '--as');
-  const saveAsName = asIdx > 0 ? inputArgs[asIdx + 1] : null;
+  const [action] = cmds;
   const helpArgs = ['-h', 'elp'];
   const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
 
+  if(!action || help) {
+    return console.log(helpText);
+  }
+
   switch(action.toLowerCase()) {
-    case 'connect': cli.emit('LIST_CONTENTS');
+    case 'connect': connectCli();
         break;
     case 'token:set': promptSetToken({required:false});
         break;
