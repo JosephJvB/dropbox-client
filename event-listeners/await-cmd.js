@@ -2,6 +2,8 @@ const prompts = require('prompts');
 
 const defaultMsg = 'cli@dbx~$';
 
+// let cache
+
 module.exports = async function awaitCmd () {
 
   const cache = this.emit('GET_CACHE');
@@ -26,10 +28,10 @@ module.exports = async function awaitCmd () {
   ];
   
   const suggestFn = async (inputRaw, opts) => {
+    if(inputRaw.length < 2) return [];
     const input = inputRaw
-    .split(' ') // dunno if I need this.. better save than sorry
-    .toLowerCase()[0];
-    if(input.length < 2) return [];
+    .split(' ')[0] // dunno if I need this.. better save than sorry
+    .toLowerCase();
 
     // special cases: display options that arent the options title
     if(input === 'cd') {
@@ -85,6 +87,8 @@ module.exports = async function awaitCmd () {
     this.emit('AWAIT_CMD');
     return;
   }
+
+  console.log(chosenCmd.value.evt)
   
   // add check: if !evts.includes(chosen.evt) error:
   this.emit(chosenCmd.value.evt, chosenCmd.value);

@@ -11,6 +11,6 @@ exports.setCache = async function setCache (folder = {}, forceUpdate = false) {
   return;
 }
 
-exports.getCache = function getCache () {
+exports.getCache = async function getCache () {
   return cache
 }
