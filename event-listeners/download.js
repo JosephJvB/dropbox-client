@@ -16,7 +16,6 @@ module.exports = async function download (file) {
   if(confirmCancelled) {
     confirmCancelled = false;
     this.emit('CLEAR_SCREEN');
-    this.emit('AWAIT_TEXT');
     return;
   }
 
@@ -33,7 +32,6 @@ module.exports = async function download (file) {
     if(renameCancelled) {
       renameCancelled = false;
       this.emit('CLEAR_SCREEN');
-      this.emit('AWAIT_TEXT');
       return;
     }
 

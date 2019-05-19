@@ -1,10 +1,18 @@
+const {
+  getCache,
+  setCache, 
+  setCwd,
+  getCwd
+} = require('./cache');
+
 module.exports = {
-  awaitText: require('./await-text'),
+  awaitText: require('./await-cmd'),
   download: require('./download'),
   upload: require('./upload'),
   info: require('./info'),
-  changeCwd: 0,
-  getCache: 0,
-  setCache: 0,
-  clearScreen
+  setCwd,
+  getCwd,
+  getCache,
+  setCache,
+  clearScreen: require('./clear-screen')
 }

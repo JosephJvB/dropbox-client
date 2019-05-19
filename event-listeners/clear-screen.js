@@ -4,4 +4,7 @@ module.exports = function clearScreen () {
   for(let i = 0; i < y; i++) {
       console.log('\033c');
   }
+  // console.log(`/Apps/[app-folder]${filePath}`);  
+  console.log('CWD:', this.emit('GET_CACHE').cwd);
+  this.emit('AWAIT_CMD');
 }

@@ -1,30 +1,23 @@
 const prompts = require('prompts');
-const dbxRequest = require('../http');
 
 const defaultMsg = 'cli@dbx~$';
 
-let cache = {};
-let CWD = '';
-
 module.exports = async function awaitCmd () {
-  // const cache = this.emit('GET_CACHE');
-  // const CWD = this.emit('GET_CWD'); // current working directory
-  if(!cache['']) {
-    cache[''] = await dbxRequest.list();
-  }
 
-  const currentChoices = cache[CWD]
-  ? cache[CWD].map(doc => {
+  const cache = this.emit('GET_CACHE');
+
+  const currentChoices = cache[cache.cwd]
+  ? cache[cache.cwd].map(doc => {
     return {
       title: `${doc.name}${doc['.tag'] === 'folder' ? '/' : ''}`,
-      value: { ...doc, evt: '' },
+      value: { ...doc, evt: '', cwd: cache.cwd },
       type: doc['.tag'],
     };
   })
   : [];
 
   const choices = [
-    {title: 'upload', value: {evt: 'UPLOAD'}, type: 'cmd'},
+    {title: 'upload', value: {evt: 'UPLOAD', cwd: cache.cwd}, type: 'cmd'},
     {title: 'quit', value: {evt: 'QUIT'}, type: 'cmd'},
     // i can have more than one choice doing the same event
     // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
@@ -33,15 +26,21 @@ module.exports = async function awaitCmd () {
   ];
   
   const suggestFn = async (inputRaw, opts) => {
-    const input = inputRaw.toLowerCase();
+    const input = inputRaw
+    .split(' ') // dunno if I need this.. better save than sorry
+    .toLowerCase()[0];
     if(input.length < 2) return [];
 
     // special cases: display options that arent the options title
     if(input === 'cd') {
-      return opts.filter(o => o.type === 'folder').map(o => {
-        o.value.evt = 'SET_CWD';
-        return o;
-      });
+      return [
+        ...opts.filter(o => o.type === 'folder').map(o => {
+          o.value.evt = 'SET_CACHE';
+          return o;
+        }),
+        {title: '..', value: {evt: 'BACK', cwd: cache.cwd}, type: 'cmd'},
+        {title: '~', value: {evt: 'HOME', cwd: cache.cwd}, type: 'cmd'},
+      ];
     } else if ('info'.includes(input)) {
       return opts.filter(o => (o.type === 'folder' || o.type ==='file')).map(o => {
         o.value.evt = 'INFO';
@@ -75,7 +74,6 @@ module.exports = async function awaitCmd () {
   if(hasCancelled) {
     setTimeout(() => console.log('"quit" to exit the cli, or double tap ctrl+c'), 50);
     this.emit('CLEAR_SCREEN');
-    this.emit('AWAIT_CMD');
     return;
   }
   
@@ -87,7 +85,8 @@ module.exports = async function awaitCmd () {
     this.emit('AWAIT_CMD');
     return;
   }
-
+  
+  // add check: if !evts.includes(chosen.evt) error:
   this.emit(chosenCmd.value.evt, chosenCmd.value);
   return;
 }
