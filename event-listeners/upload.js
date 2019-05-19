@@ -22,8 +22,8 @@ module.exports = async function upload () {
     return;
   }
 
-  const value = userInput.value.split(' ')
-  const [ref] = value;
+  const args = userInput.value.split(' ')
+  const [ref] = args;
   const asIdx = args.findIndex(a => a === '--as');
   const saveAsName = asIdx > 0 ? args[asIdx + 1] : null;
 
@@ -32,10 +32,10 @@ module.exports = async function upload () {
     fileName = saveAsName
   } else {
     const fileNameArr = ref.split('/');
-    fileName = fileNameArr[pathArr.length - 1];
+    fileName = fileNameArr[fileNameArr.length - 1];
   }
 
-  await dbxRequest.upload(chosen.fileReference, fileName);
+  await dbxRequest.upload(ref, fileName);
 
   // update cache @ cwd
   await setCache(cache.cwd, true);

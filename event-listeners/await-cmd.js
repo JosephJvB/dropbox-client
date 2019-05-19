@@ -10,15 +10,19 @@ module.exports = async function awaitCmd () {
 
   const cache = getCache();
 
-  const currentChoices = cache[cache.cwd] ? cache[cache.cwd] : [];
-
+  const dbxFileChoices = cache[cache.cwd] ? cache[cache.cwd] : [];
+  const navChoices = [
+    {title: '..', value: {evt: 'BACK', cwd: cache.cwd}, type: 'nav'},
+        {title: '~', value: {evt: 'HOME', cwd: cache.cwd}, type: 'nav'}
+  ];
   const choices = [
     {title: 'upload', value: {evt: 'UPLOAD'}, type: 'cmd'},
     {title: 'quit', value: {evt: 'QUIT'}, type: 'cmd'},
+    {title: 'help', value: {evt: 'SHOW_HELP'}, type: 'cmd'},
     // i can have more than one choice doing the same event
     // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
-    {title: 'help', value: {evt: 'SHOW_HELP'}, type: 'cmd'},
-    ...currentChoices
+    ...dbxFileChoices,
+    ...navChoices
   ];
   
   const suggestFn = async (inputRaw, opts) => {
@@ -30,7 +34,7 @@ module.exports = async function awaitCmd () {
     // special cases: display options that arent the options title
     if(input === 'ls') {
       // only show file / folder options
-      return currentChoices.map(o => {
+      return dbxFileChoices.map(o => {
           if(o.type === 'folder') {
             o.value.evt = 'CHANGE_DIR';
           } else if (o.type === 'file') {
@@ -39,14 +43,10 @@ module.exports = async function awaitCmd () {
           return o;
         });
     } else if(input === 'cd') {
-      return [
-        ...opts.filter(o => o.type === 'folder').map(o => {
-          o.value.evt = 'CHANGE_DIR';
-          return o;
-        }),
-        {title: '..', value: {evt: 'BACK', cwd: cache.cwd}, type: 'cmd'},
-        {title: '~', value: {evt: 'HOME', cwd: cache.cwd}, type: 'cmd'},
-      ];
+      return opts.filter(o => (o.type === 'folder' || o.type === 'nav')).map(o => {
+        o.value.evt = 'CHANGE_DIR';
+        return o;
+      });
     } else if ('info'.includes(input)) {
       return opts.filter(o => (o.type === 'folder' || o.type ==='file')).map(o => {
         o.value.evt = 'INFO';
@@ -75,6 +75,7 @@ module.exports = async function awaitCmd () {
     type: 'autocomplete',
     name: 'value',
     choices,
+    limit: process.stdout.getWindowSize()[1] - 3,
     message: defaultMsg,
     suggest: suggestFn,
   }, {

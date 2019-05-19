@@ -14,5 +14,5 @@ module.exports = async function writeInfo (metaPath) {
         },
         data: { path: metaPath }
     });
-    console.log(result.data);
+    return result.data;
 }

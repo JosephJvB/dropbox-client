@@ -1,7 +1,9 @@
 const dbxRequest = require('../http');
 
-module.exports = function info () {
-  dbxRequest.info(file.id);
+module.exports = async function info (file) {
+  const info = await dbxRequest.info(file.id);
 
-  this.emit('AWAIT_TEXT');
+  console.log(info);
+
+  this.emit('AWAIT_CMD');
 }

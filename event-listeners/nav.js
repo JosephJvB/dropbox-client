@@ -1,4 +1,4 @@
-const { setCache, getCache } = require('../lib/cache');
+const { setCache } = require('../lib/cache');
 
 exports.changeDir = async function changeDir (file) {
   await setCache(file.path_lower);
