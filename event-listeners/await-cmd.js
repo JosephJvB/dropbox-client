@@ -4,81 +4,50 @@ const { getCache } = require('../lib/cache');
 
 const defaultMsg = 'cli@dbx~$';
 
-// let cache
-
 module.exports = async function awaitCmd () {
 
   const cache = getCache();
 
-  const dbxFileChoices = cache[cache.cwd] ? cache[cache.cwd] : [];
+  const cachedDbxContents = cache[cache.cwd] ? cache[cache.cwd] : [];
   const navChoices = [
-    {title: '..', value: {evt: 'BACK', cwd: cache.cwd}, type: 'nav'},
-        {title: '~', value: {evt: 'HOME', cwd: cache.cwd}, type: 'nav'}
+    {title: '..', value: {evt: 'CHANGE_DIR', path_lower: getPrevDir(cache.cwd)}, type: 'nav'},
+    {title: '~', value: {evt: 'CHANGE_DIR', path_lower: ''}, type: 'nav'}
   ];
-  const choices = [
+  // i can have more than one choice doing the same event
+  // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
+  const defaultChoices = [ 
     {title: 'upload', value: {evt: 'UPLOAD'}, type: 'cmd'},
     {title: 'quit', value: {evt: 'QUIT'}, type: 'cmd'},
     {title: 'help', value: {evt: 'SHOW_HELP'}, type: 'cmd'},
-    // i can have more than one choice doing the same event
-    // {title: 'exit', value: {evt: 'QUIT'}, type: 'cmd'},
   ];
+  const all = [
+    ...cachedDbxContents.folders,
+    ...cachedDbxContents.files,
+    ...defaultChoices,
+    ...navChoices
+  ]
   
-  // let grabbedInput = '';
-  const suggestFn = async (inputRaw, opts) => {
+  // Offer different suggestions based on user input
+  const suggestFn = async (inputRaw) => {
     if(inputRaw.length < 2) return [];
     const input = inputRaw
-    .split(' ')[0] // dunno if I need this.. better save than sorry
+    .split(' ')[0] // dunno if I need this.. better safe than sorry
     .toLowerCase();
 
-    // grabbedInput = input;
-
-    // special cases: display options that arent the options title
-    if(input === 'ls') {
-      // only show file / folder options
-      return dbxFileChoices.map(o => {
-          if(o.type === 'folder') {
-            o.value.evt = 'CHANGE_DIR';
-          } else if (o.type === 'file') {
-            o.value.evt = 'INFO';
-          }
-          return o;
-        });
-    } else if(input === 'cd') {
-      return [
-        ...dbxFileChoices.filter(o => o.type === 'folder').map(o => {
-          o.value.evt = 'CHANGE_DIR';
-          return o;
-        }),
-        ...navChoices
-      ];
-    } else if ('info'.includes(input)) {
-      return dbxFileChoices.map(o => {
-        o.value.evt = 'INFO';
-        return o;
-      });
-    } else if ('download'.includes(input)) {
-      return dbxFileChoices.filter(o => o.type ==='file').map(o => {
-        o.value.evt = 'DOWNLOAD';
-        return o;
-      });
-    } else {
-      // display valid options by title
-      return opts.filter(o => o.title.includes(input)).map(o => {
-        if(o.type === 'folder') {
-          o.value.evt = 'CHANGE_DIR';
-        } else if (o.type === 'file') {
-          o.value.evt = 'INFO';
-        }
-        return o;
-      });
-    }
+    if(input ==='ls') return [...cachedDbxContents.folders, ...cachedDbxContents.files];
+    if(input ==='cd') return [...cachedDbxContents.folders, ...navChoices];
+    if('download'.includes(input)) return cachedDbxContents.files.map(f => {
+      f.value.evt = 'DOWNLOAD'
+      return f;
+    });
+    else return all.filter(o => o.title.includes(input));
   }
 
   let hasCancelled = false;
   const chosenCmd = await prompts({
     type: 'autocomplete',
     name: 'value',
-    choices,
+    choices: defaultChoices,
     limit: process.stdout.getWindowSize()[1] - 3,
     message: defaultMsg,
     suggest: suggestFn,
@@ -108,4 +77,9 @@ module.exports = async function awaitCmd () {
   // add check: if !evts.includes(chosen.evt) error:
   this.emit(chosenCmd.value.evt, chosenCmd.value);
   return;
+}
+
+function getPrevDir (path) {
+  const currentPathArr = path.split('/');
+  return currentPathArr.slice(0, currentPathArr.length - 1).join('/');
 }

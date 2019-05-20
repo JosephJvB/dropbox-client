@@ -20,11 +20,6 @@ dbx token:destroy
 
 ### TODO
 - ??
+- maybe the cache sets all suggest options???
 - can set a download path
-- suggestFn: remove.map()'s  remove if-else-if
-  - grab input line 26
-  - use input and value.type to determine the event
-    - switch statement after prompt
-    - ls + file = info
-    = ls + 
 - mkdir, mv, delete functions
