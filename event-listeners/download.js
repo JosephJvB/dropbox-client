@@ -35,7 +35,13 @@ module.exports = async function download (file) {
       return;
     }
 
-    file.name = renameChoice.fileName;
+    // make sure user doesnt accidentally change filetype..
+    const ext = file.path_lower.split('.').pop()
+    const newName = renameChoice.fileName.endsWith(ext)
+    ? renameChoice.fileName
+    : renameChoice.fileName + '.' + ext;
+
+    file.name = newName;
   }
 
   await dbxRequest.download(file);

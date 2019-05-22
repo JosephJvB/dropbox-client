@@ -9,17 +9,25 @@ module.exports = async function handleUpload (fileString, saveAsName) {
         const isUrl = !!url.parse(fileString).protocol;
         const uploadFn = isUrl ? uploadRemoteFile : uploadLocalFile;
         
+        // if local upload, make sure file is uploaded with its extension
+        const ext = fileString.split('.').pop();
+        const uploadFileName = isUrl
+        ? saveAsName
+        : saveAsName.endsWith(ext)
+            ? saveAsName
+            : saveAsName + '.' + ext;
+
         console.log(`
         Uploading ${fileString}
-        Saving ${saveAsName} to dropbox
+        Saving ${uploadFileName} to dropbox
         `);
         
-        const uploadResult = await uploadFn(fileString, saveAsName);
+        const uploadResult = await uploadFn(fileString, uploadFileName);
         
         console.log('Upload successful ✔\n');
 }
     
-    function uploadLocalFile (localFile, filePath) {
+function uploadLocalFile (localFile, filePath) {
     return axios(api.upload, {
         method: 'POST',
         data: fs.createReadStream(localFile),
