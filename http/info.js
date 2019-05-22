@@ -9,8 +9,8 @@ module.exports = async function writeInfo (metaPath) {
     const result = await axios(api.file_meta, {
         method: 'POST',
         headers: {
-        Authorization: process.env.APP_TOKEN,
-        'Content-Type': 'application/json'
+            Authorization: process.env.APP_TOKEN,
+            'Content-Type': 'application/json'
         },
         data: { path: metaPath }
     });

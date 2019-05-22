@@ -3,6 +3,10 @@ const prompts = require('prompts');
 const dbxRequest = require('../http');
 const { setCache, getCache } = require('../lib/cache');
 
+// handle file paths better
+// ./ === __dirname
+// ~/ === os.homedir()
+// else try resolve filePath as normal
 module.exports = async function upload () {
   const cache = getCache();
   console.log('Uploading to ', cache.cwd);
