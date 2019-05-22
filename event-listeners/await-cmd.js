@@ -7,7 +7,7 @@ const defaultMsg = 'cli@dbx~$';
 module.exports = async function awaitCmd () {
 
   const cache = getCache();
-
+  
   const cachedDbxContents = cache[cache.cwd] ? cache[cache.cwd] : [];
   const navChoices = [
     {title: '..', value: {evt: 'CHANGE_DIR', path_lower: getPrevDir(cache.cwd)}, type: 'nav'},

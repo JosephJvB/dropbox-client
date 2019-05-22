@@ -4,5 +4,6 @@ module.exports = {
   upload: require('./upload'),
   info: require('./info'),
   clearScreen: require('./clear-screen'),
-  changeDir: require('./change-dir')
+  changeDir: require('./change-dir'),
+  fileSelect: require('./file-select')
 }

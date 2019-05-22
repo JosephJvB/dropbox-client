@@ -19,7 +19,8 @@ dbx token:destroy
 
 
 ### TODO
-- ??
 - maybe the cache sets all suggest options???
+- handle upload paths better
 - can set a download path
 - mkdir, mv, delete functions
+  - can do a hacky mkdir by uploading to a folder path that doesnt exist yet. eg upload: `/fake-folder/newfile.txt`
