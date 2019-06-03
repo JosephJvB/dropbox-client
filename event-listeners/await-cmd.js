@@ -8,7 +8,7 @@ module.exports = async function awaitCmd () {
 
   const cache = getCache();
   
-  const cachedDbxContents = cache[cache.cwd] ? cache[cache.cwd] : [];
+  const cachedDbxContents = cache[cache.cwd] || [];
   const navChoices = [
     {title: '..', value: {evt: 'CHANGE_DIR', path_lower: getPrevDir(cache.cwd)}, type: 'nav'},
     {title: '~', value: {evt: 'CHANGE_DIR', path_lower: ''}, type: 'nav'}

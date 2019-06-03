@@ -22,10 +22,10 @@ const connectCli = require('./lib/connect');
       : cmds.push(arg)
   }
   const [action] = cmds;
-  const helpArgs = ['-h', 'elp'];
+  const helpArgs = ['-h', 'help'];
   const help = flags.find(a => helpArgs.includes(a.toLowerCase())); 
 
-  if(!action || help) {
+  if(!action || action === 'help' || help) {
     return console.log(helpText);
   }
 
@@ -44,8 +44,6 @@ const connectCli = require('./lib/connect');
 
 
 var helpText = `
-  key: <> = required, [] = optional
-
   Usage:
 
   dbx connect
